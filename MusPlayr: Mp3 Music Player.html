@@ -1,0 +1,1171 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/5683/5683980.png" type="image/x-icon">
+    <title>MusPlayr</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Press+Start+2P&family=Courier+Prime&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            transition: all 0.3s ease;
+        }
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            background: #fff;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            border-radius: 15px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: row;
+            margin: 20px 0;
+        }
+        .sidebar {
+            width: 30%;
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 20px;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+        .sidebar h2 {
+            margin-top: 0;
+            font-weight: 700;
+            color: #3498db;
+        }
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+            overflow-y: auto;
+            flex-grow: 1;
+            max-height: calc(100vh - 100px); /* Adjust this value as needed */
+        }
+        .sidebar ul li {
+            cursor: pointer;
+            padding: 10px;
+            border-bottom: 1px solid #34495e;
+        }
+        .sidebar ul li:hover {
+            background-color: #34495e;
+        }
+        .no-songs-message {
+            text-align: center;
+            color: #95a5a6;
+            margin-top: 20px;
+        }
+        .sidebar li {
+            padding: 12px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            border-radius: 5px;
+            margin-bottom: 5px;
+        }
+        .sidebar li:hover {
+            background: #34495e;
+        }
+        .player {
+            width: 70%;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: linear-gradient(145deg, #f0f0f0, #ffffff);
+        }
+        .player img {
+            width: 250px;
+            height: 250px;
+            object-fit: cover;
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+        .player img:hover {
+            transform: scale(1.05);
+        }
+        .player .info {
+            margin: 25px 0;
+            text-align: center;
+        }
+        .player .info h2 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        .player .info p {
+            color: #7f8c8d;
+        }
+        .player .controls {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            margin-top: 20px;
+        }
+        .player .controls button {
+            padding: 12px 20px;
+            margin: 0 10px;
+            cursor: pointer;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-size: 16px;
+            transition: background-color 0.3s ease, transform 0.1s ease;
+        }
+        .player .controls button:hover {
+            background-color: #2980b9;
+            transform: scale(1.05);
+        }
+        .player .volume {
+            margin-top: 30px;
+            width: 80%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .player .volume input {
+            width: 80%;
+            -webkit-appearance: none;
+            height: 5px;
+            border-radius: 5px;
+            background: #d3d3d3;
+            outline: none;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+        .player .volume input:hover {
+            opacity: 1;
+        }
+        .player .volume input::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            background: #3498db;
+            cursor: pointer;
+        }
+        .player .like, .player .equalizer {
+            margin-top: 25px;
+            cursor: pointer;
+            font-size: 24px;
+            color: #3498db;
+            transition: color 0.3s ease, transform 0.1s ease;
+        }
+        .player .like:hover, .player .equalizer:hover {
+            color: #e74c3c;
+            transform: scale(1.1);
+        }
+        .settings {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            cursor: pointer;
+        }
+        
+        /* Media Queries for Responsiveness */
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+                width: 95%;
+            }
+            .sidebar, .player {
+                width: 100%;
+            }
+            .player img {
+                width: 200px;
+                height: 200px;
+            }
+            .player .controls button {
+                padding: 10px 15px;
+                font-size: 14px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .player img {
+                width: 150px;
+                height: 150px;
+            }
+            .player .controls {
+                flex-wrap: wrap;
+            }
+            .player .controls button {
+                margin: 5px;
+            }
+            .player .volume {
+                width: 100%;
+            }
+        }
+        
+        .settings-overlay, .equalizer-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .settings-content, .equalizer-content {
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            max-width: 500px;
+            width: 90%;
+        }
+
+.theme-selection, .theme-preview {
+    margin-bottom: 20px;
+}
+.preview-container {
+    display: flex;
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    width: 100%;
+    max-width: 400px;
+    margin: 15px auto;
+}
+.preview-sidebar {
+    width: 30%;
+    background-color: #e0e0e0;
+    padding: 15px;
+}
+.preview-sidebar h4 {
+    margin-top: 0;
+    color: #333;
+}
+.preview-sidebar ul {
+    list-style-type: none;
+    padding: 0;
+}
+.preview-sidebar li {
+    padding: 5px 0;
+    color: #555;
+}
+.preview-player {
+    width: 70%;
+    background-color: #d0d0d0;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.preview-album {
+    width: 120px;
+    height: 120px;
+    background-color: #c0c0c0;
+    margin-bottom: 15px;
+    border-radius: 5px;
+}
+.preview-info {
+    text-align: center;
+    margin-bottom: 15px;
+}
+.preview-title {
+    font-weight: bold;
+    margin: 0;
+    color: #333;
+}
+.preview-artist {
+    margin: 5px 0 0;
+    color: #666;
+}
+.preview-controls {
+    display: flex;
+    justify-content: center;
+}
+.preview-button {
+    background-color: #4CAF50;
+    border: none;
+    color: white;
+    padding: 10px 15px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 0 5px;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+}
+.preview-button:hover {
+    background-color: #45a049;
+}
+
+        .preview-controls button {
+            margin: 0 5px;
+            padding: 5px 10px;
+            background: #3498db;
+            color: #fff;
+            border: none;
+            border-radius: 3px;
+        }
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.5s ease, visibility 0s 0.5s;
+        }
+        
+        .overlay.active {
+            opacity: 1;
+            visibility: visible;
+            transition: opacity 0.5s ease;
+        }
+    </style>
+    <script>
+        // Theme preview functionality
+        function updateThemePreview() {
+            const theme = document.getElementById('theme').value;
+            const previewContainer = document.querySelector('.preview-container');
+            const previewSidebar = document.querySelector('.preview-sidebar');
+            const previewPlayer = document.querySelector('.preview-player');
+            const previewAlbum = document.querySelector('.preview-album');
+            const previewButtons = document.querySelectorAll('.preview-controls button');
+
+            // Reset classes
+            previewContainer.className = 'preview-container';
+            previewSidebar.className = 'preview-sidebar';
+            previewPlayer.className = 'preview-player';
+            previewAlbum.className = 'preview-album';
+            previewButtons.forEach(button => button.className = '');
+
+            // Apply theme-specific classes
+            previewContainer.classList.add(`${theme}-theme`);
+            previewSidebar.classList.add(`${theme}-sidebar`);
+            previewPlayer.classList.add(`${theme}-player`);
+            previewAlbum.classList.add(`${theme}-album`);
+            previewButtons.forEach(button => button.classList.add(`${theme}-button`));
+
+            // Update styles based on the selected theme
+            switch(theme) {
+                case 'default':
+                    previewContainer.style.background = '#f0f0f0';
+                    previewSidebar.style.background = '#333';
+                    previewPlayer.style.background = '#fff';
+                    previewButtons.forEach(button => {
+                        button.style.background = '#3498db';
+                        button.style.color = '#fff';
+                    });
+                    break;
+                case 'retro':
+                    previewContainer.style.background = '#f4e8d1';
+                    previewSidebar.style.background = '#d2b48c';
+                    previewPlayer.style.background = '#f4e8d1';
+                    previewAlbum.style.background = '#8b4513';
+                    previewButtons.forEach(button => {
+                        button.style.background = '#cd853f';
+                        button.style.color = '#fff';
+                    });
+                    break;
+                case 'old':
+                    previewContainer.style.background = '#d3d3d3';
+                    previewSidebar.style.background = '#8b4513';
+                    previewPlayer.style.background = '#f5deb3';
+                    previewButtons.forEach(button => {
+                        button.style.background = '#a0522d';
+                        button.style.color = '#fff';
+                    });
+                    break;
+                case 'western':
+                    previewContainer.style.background = '#f4a460';
+                    previewSidebar.style.background = '#8b4513';
+                    previewPlayer.style.background = '#deb887';
+                    previewButtons.forEach(button => {
+                        button.style.background = '#b8860b';
+                        button.style.color = '#fff';
+                    });
+                    break;
+                case 'modern':
+                    previewContainer.style.background = '#f5f5f5';
+                    previewSidebar.style.background = '#2c3e50';
+                    previewPlayer.style.background = 'linear-gradient(145deg, #f0f0f0, #ffffff)';
+                    previewButtons.forEach(button => {
+                        button.style.background = '#3498db';
+                        button.style.color = '#fff';
+                    });
+                    break;
+                case 'futuristic':
+                    previewContainer.style.background = '#000';
+                    previewSidebar.style.background = '#1a1a1a';
+                    previewPlayer.style.background = '#333';
+                    previewButtons.forEach(button => {
+                        button.style.background = '#00ff00';
+                        button.style.color = '#000';
+                    });
+                    break;
+                case 'spacey':
+                    previewContainer.style.background = '#000033';
+                    previewSidebar.style.background = '#000066';
+                    previewPlayer.style.background = '#000099';
+                    previewButtons.forEach(button => {
+                        button.style.background = '#4169e1';
+                        button.style.color = '#fff';
+                    });
+                    break;
+                case 'Christmas':
+                    previewContainer.style.background = '#006400';
+                    previewSidebar.style.background = '#8b0000';
+                    previewPlayer.style.background = '#ffffff';
+                    previewButtons.forEach(button => {
+                        button.style.background = '#ff0000';
+                        button.style.color = '#fff';
+                    });
+                    break;
+                case 'Halloween':
+                    previewContainer.style.background = '#000000';
+                    previewSidebar.style.background = '#ff4500';
+                    previewPlayer.style.background = '#ff8c00';
+                    previewButtons.forEach(button => {
+                        button.style.background = '#9400d3';
+                        button.style.color = '#fff';
+                    });
+                    break;
+                case 'Summer':
+                    previewContainer.style.background = '#87ceeb';
+                    previewSidebar.style.background = '#ffd700';
+                    previewPlayer.style.background = '#f0e68c';
+                    previewButtons.forEach(button => {
+                        button.style.background = '#ff6347';
+                        button.style.color = '#fff';
+                    });
+                    break;
+            }
+        }
+
+        // Call updateThemePreview when the page loads
+        document.addEventListener('DOMContentLoaded', updateThemePreview);
+
+        // Function to open settings overlay
+        function openSettings() {
+            document.getElementById('settings-overlay').style.display = 'flex';
+        }
+
+        // Function to close settings overlay
+        function closeSettings() {
+            document.getElementById('settings-overlay').style.display = 'none';
+        }
+
+        // Event listener for settings button
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelector('.settings').addEventListener('click', openSettings);
+        });
+
+        // Function to apply the selected theme to the main player
+        function applyTheme(theme) {
+            const container = document.querySelector('.container');
+            const sidebar = document.querySelector('.sidebar');
+            const player = document.querySelector('.player');
+            const albumArt = document.querySelector('#album-cover');
+            const buttons = document.querySelectorAll('.player .controls button');
+            const songList = document.querySelectorAll('.sidebar ul li');
+
+            // Reset classes
+            container.className = 'container';
+            sidebar.className = 'sidebar';
+            player.className = 'player';
+            albumArt.className = '';
+            buttons.forEach(button => button.className = '');
+
+            // Apply theme-specific classes
+            container.classList.add(`${theme}-theme`);
+            sidebar.classList.add(`${theme}-sidebar`);
+            player.classList.add(`${theme}-player`);
+            albumArt.classList.add(`${theme}-album`);
+            buttons.forEach(button => button.classList.add(`${theme}-button`));
+
+            // Update styles based on the selected theme
+            switch(theme) {
+                case 'default':
+                    document.body.style.fontFamily = "'Roboto', sans-serif";
+                    document.body.style.background = 'linear-gradient(145deg, #f0f0f0, #ffffff)';
+                    sidebar.style.background = 'linear-gradient(145deg, #2c3e50, #34495e)';
+                    player.style.background = 'linear-gradient(145deg, #ecf0f1, #ffffff)';
+                    buttons.forEach(button => {
+                        button.style.background = 'linear-gradient(145deg, #3498db, #2980b9)';
+                        button.style.color = '#fff';
+                    });
+                    songList.forEach(item => {
+                        item.style.borderBottom = '1px solid #34495e';
+                    });
+                    break;
+                case 'retro':
+                    document.body.style.fontFamily = "'Press Start 2P', cursive";
+                    document.body.style.background = 'linear-gradient(145deg, #f4e8d1, #d2b48c)';
+                    sidebar.style.background = 'linear-gradient(145deg, #cd853f, #deb887)';
+                    player.style.background = 'linear-gradient(145deg, #f4e8d1, #faebd7)';
+                    buttons.forEach(button => {
+                        button.style.background = 'linear-gradient(145deg, #cd853f, #d2691e)';
+                        button.style.color = '#fff';
+                    });
+                    songList.forEach(item => {
+                        item.style.borderBottom = '1px solid #8b4513';
+                    });
+                    break;
+                case 'old':
+                    document.body.style.fontFamily = "'Courier New', Courier, monospace";
+                    document.body.style.background = 'linear-gradient(145deg, #d3d3d3, #a9a9a9)';
+                    sidebar.style.background = 'linear-gradient(145deg, #8b4513, #a0522d)';
+                    player.style.background = 'linear-gradient(145deg, #f5deb3, #deb887)';
+                    buttons.forEach(button => {
+                        button.style.background = 'linear-gradient(145deg, #a0522d, #8b4513)';
+                        button.style.color = '#fff';
+                    });
+                    songList.forEach(item => {
+                        item.style.borderBottom = '1px solid #d2691e';
+                    });
+                    break;
+                case 'western':
+                    document.body.style.background = '#f4a460';
+                    sidebar.style.background = '#8b4513';
+                    player.style.background = '#deb887';
+                    buttons.forEach(button => {
+                        button.style.background = '#b8860b';
+                        button.style.color = '#fff';
+                    });
+                    break;
+                case 'modern':
+                    document.body.style.background = '#f5f5f5';
+                    sidebar.style.background = '#2c3e50';
+                    player.style.background = 'linear-gradient(145deg, #f0f0f0, #ffffff)';
+                    buttons.forEach(button => {
+                        button.style.background = '#3498db';
+                        button.style.color = '#fff';
+                    });
+                    break;
+                case 'futuristic':
+                    document.body.style.background = '#000';
+                    sidebar.style.background = '#1a1a1a';
+                    player.style.background = '#333';
+                    buttons.forEach(button => {
+                        button.style.background = '#00ff00';
+                        button.style.color = '#000';
+                    });
+                    break;
+                case 'spacey':
+                    document.body.style.background = '#000033';
+                    sidebar.style.background = '#000066';
+                    player.style.background = '#000099';
+                    buttons.forEach(button => {
+                        button.style.background = '#4169e1';
+                        button.style.color = '#fff';
+                    });
+                    break;
+                case 'Christmas':
+                    document.body.style.background = '#006400';
+                    sidebar.style.background = '#8b0000';
+                    player.style.background = '#ffffff';
+                    buttons.forEach(button => {
+                        button.style.background = '#ff0000';
+                        button.style.color = '#fff';
+                    });
+                    break;
+                case 'Halloween':
+                    document.body.style.background = '#000000';
+                    sidebar.style.background = '#ff4500';
+                    player.style.background = '#ff8c00';
+                    buttons.forEach(button => {
+                        button.style.background = '#9400d3';
+                        button.style.color = '#fff';
+                    });
+                    break;
+                case 'Summer':
+                    document.body.style.background = '#87ceeb';
+                    sidebar.style.background = '#ffd700';
+                    player.style.background = '#f0e68c';
+                    buttons.forEach(button => {
+                        button.style.background = '#ff6347';
+                        button.style.color = '#fff';
+                    });
+                    break;
+                default:
+                    // Reset to default styles
+                    document.body.style.background = '#f0f0f0';
+                    sidebar.style.background = '';
+                    player.style.background = '';
+                    buttons.forEach(button => {
+                        button.style.background = '';
+                        button.style.color = '';
+                    });
+            }
+        }
+
+        // Function to save settings and apply theme
+        function saveSettings() {
+            const selectedTheme = document.getElementById('theme').value;
+            applyTheme(selectedTheme);
+            closeSettings();
+        }
+
+        // Add event listener to save settings button
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('save-settings').addEventListener('click', saveSettings);
+        });
+    </script>
+</head>
+<body>
+    <div class="settings">Settings</div>
+    <div class="settings-overlay" id="settings-overlay">
+        <div class="settings-content">
+            <h2>Settings</h2>
+            <div class="theme-selection">
+                <label for="theme">Theme:</label>
+                <select id="theme" onchange="updateThemePreview()">
+                    <option value="default">Default</option>
+                    <option value="retro">Retro</option>
+                    <option value="old">Old</option>
+                    <option value="western">Western</option>
+                    <option value="modern">Modern</option>
+                    <option value="futuristic">Futuristic</option>
+                    <option value="spacey">Spacey</option>
+                    <option value="Christmas">Christmas</option>
+                    <option value="Halloween">Halloween</option>
+                    <option value="Summer">Summer</option>
+                </select>
+            </div>
+<div class="theme-preview">
+    <h3>Theme Preview</h3>
+    <div class="preview-container">
+        <div class="preview-sidebar">
+            <h4>Sidebar</h4>
+            <ul>
+                <li>Song 1</li>
+                <li>Song 2</li>
+                <li>Song 3</li>
+            </ul>
+        </div>
+        <div class="preview-player">
+            <div class="preview-album"></div>
+            <div class="preview-info">
+                <p class="preview-title">Song Title</p>
+                <p class="preview-artist">Artist Name</p>
+            </div>
+            <div class="preview-controls">
+                <button class="preview-button">◀◀</button>
+                <button class="preview-button">▶</button>
+                <button class="preview-button">▶▶</button>
+            </div>
+        </div>
+    </div>
+</div>
+            <label for="background-color">Background Color</label>
+            <input type="color" id="background-color" value="#f0f0f0">
+            <button onclick="closeSettings()">Close</button>
+            <button onclick="saveSettings()">Save</button>
+        </div>
+    </div>
+    <div class="equalizer-overlay" id="equalizer-overlay">
+        <div class="equalizer-content">
+            <h2>Equalizer</h2>
+            <label for="preset">Preset</label>
+            <select id="preset">
+                <option value="flat">Flat</option>
+                <option value="bass-boost">Bass Boost</option>
+                <option value="treble-boost">Treble Boost</option>
+                <option value="vocal-boost">Vocal Boost</option>
+                <option value="rock">Rock</option>
+                <option value="pop">Pop</option>
+            </select>
+            <label for="custom-preset">Custom Preset (comma-separated values for 60Hz, 230Hz, 910Hz, 4kHz, 14kHz):</label>
+            <input type="text" id="custom-preset" placeholder="0,0,0,0,0">
+            <button id="save-equalizer">Save</button>
+        </div>
+    </div>
+    <div class="container">
+<div class="sidebar">
+    <h2>Songs</h2>
+
+    <ul id="song-list">
+        <!-- Songs will be dynamically added here -->
+    </ul>
+</div>
+        <div class="player">
+            <button id="insert-button"> Add Songs</button>
+            <img id="album-cover" src="" alt="Album Cover">
+            <div class="info">
+                <div id="title">Title</div>
+                <div id="artist">Artist</div>
+            </div>
+            <div class="controls">
+                <button id="seek-backward">Seek Backward</button>
+                <button id="play-pause">Play/Pause</button>
+                <button id="seek-forward">Seek Forward</button>
+                <button id="loop">Loop</button>
+            </div>
+            <input type="range" id="playback-bar" min="0" max="100" value="0">
+            <div class="volume">
+                <label for="volume-slider"></label>
+                <input type="range" id="volume-slider" min="0" max="100" value="50">
+            </div>
+            <div class="like" id="like-button">Like</div>
+            <div class="equalizer" id="equalizer-button">Equalizer</div>
+        </div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsmediatags/3.9.5/jsmediatags.min.js"></script>
+    <script>
+        let audio = new Audio();
+        let currentFile = null;
+        let isPlaying = false;
+        let isLooping = false;
+        let likedFiles = new Set();
+
+        document.getElementById('insert-button').addEventListener('click', function() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'audio/mp3';
+            input.multiple = true;
+            input.onchange = function(event) {
+                const files = event.target.files;
+                const fileArray = Array.from(files).sort((a, b) => a.name.localeCompare(b.name));
+                fileArray.forEach(file => {
+                    songs.push({
+                        title: file.name,
+                        artist: 'Unknown',
+                        file: file
+                    });
+                });
+                populateSidebar();
+                if (files.length > 0) {
+                    loadFile(files[0]);
+                }
+            };
+            input.click();
+        });
+
+        function loadFile(file) {
+            currentFile = file;
+            audio.src = URL.createObjectURL(file);
+            audio.play();
+            isPlaying = true;
+            updatePlayPauseButton();
+            updateLikeButton(file);
+            updateNowPlaying(file);
+        }
+
+        // Initialize an empty array to store songs
+        const songs = [];
+
+        // Function to populate the sidebar with songs
+        function populateSidebar() {
+            const songList = document.getElementById('song-list');
+            songList.innerHTML = ''; // Clear existing list
+            if (songs.length === 0) {
+                const noSongsMessage = document.createElement('div');
+                noSongsMessage.className = 'no-songs-message';
+                noSongsMessage.textContent = 'No songs added yet. Click "Add Songs" to get started!';
+                songList.appendChild(noSongsMessage);
+            } else {
+                songs.forEach((song, index) => {
+                    const li = document.createElement('li');
+                    li.textContent = `${song.title} - ${song.artist}`;
+                    li.onclick = () => loadFile(song.file);
+                    songList.appendChild(li);
+                });
+            }
+        }
+
+        // Call populateSidebar initially to show the no-songs message
+        populateSidebar();
+
+        function loadFile(file) {
+            currentFile = file;
+            jsmediatags.read(file, {
+                onSuccess: function(tag) {
+                    const { title, artist, picture } = tag.tags;
+                    document.getElementById('title').textContent = title || 'Unknown Title';
+                    document.getElementById('artist').textContent = artist || 'Unknown Artist';
+                    if (picture) {
+                        const base64String = arrayBufferToBase64(picture.data);
+                        document.getElementById('album-cover').src = `data:${picture.format};base64,${base64String}`;
+                    } else {
+                        document.getElementById('album-cover').src = '';
+                    }
+                    playFile(file);
+                    updateMediaSession(tag.tags);
+                    updateLikeButton(file);
+                },
+                onError: function(error) {
+                    console.log(error);
+                }
+            });
+        }
+
+        function playFile(file) {
+            currentFile = file;  // Set the currentFile
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                audio.src = event.target.result;
+                initAudio();  // Initialize audio context
+                audio.play();
+                isPlaying = true;
+                document.getElementById('play-pause').textContent = 'Pause';
+                updateLikeButton(file);  // Update like button state
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function updateLikeButton(file) {
+            const likeButton = document.getElementById('like-button');
+            if (likedFiles.has(file.name)) {
+                likeButton.textContent = 'Liked';
+            } else {
+                likeButton.textContent = 'Like';
+            }
+        }
+
+        document.getElementById('play-pause').addEventListener('click', function() {
+            if (isPlaying) {
+                audio.pause();
+                isPlaying = false;
+                this.textContent = 'Play';
+            } else {
+                audio.play();
+                isPlaying = true;
+                this.textContent = 'Pause';
+            }
+        });
+
+        document.getElementById('seek-backward').addEventListener('click', function() {
+            audio.currentTime = Math.max(0, audio.currentTime - 20);
+        });
+
+        document.getElementById('seek-forward').addEventListener('click', function() {
+            audio.currentTime = Math.min(audio.duration, audio.currentTime + 20);
+        });
+
+        document.getElementById('loop').addEventListener('click', function() {
+            isLooping = !isLooping;
+            audio.loop = isLooping;
+            this.textContent = isLooping ? 'Looping' : 'Loop';
+        });
+
+        document.getElementById('volume-slider').addEventListener('input', function() {
+            audio.volume = this.value / 100;
+        });
+
+        audio.addEventListener('timeupdate', function() {
+            const playbackBar = document.getElementById('playback-bar');
+            playbackBar.value = (audio.currentTime / audio.duration) * 100;
+        });
+
+        document.getElementById('playback-bar').addEventListener('input', function() {
+            audio.currentTime = (this.value / 100) * audio.duration;
+        });
+
+        function arrayBufferToBase64(buffer) {
+            let binary = '';
+            const bytes = new Uint8Array(buffer);
+            const len = bytes.byteLength;
+            for (let i = 0; i < len; i++) {
+                binary += String.fromCharCode(bytes[i]);
+            }
+            return window.btoa(binary);
+        }
+
+        function updateMediaSession(tags) {
+            if ('mediaSession' in navigator) {
+                navigator.mediaSession.metadata = new MediaMetadata({
+                    title: tags.title || 'Unknown Title',
+                    artist: tags.artist || 'Unknown Artist',
+                    album: tags.album || 'Unknown Album',
+                    artwork: [
+                        { src: document.getElementById('album-cover').src, sizes: '512x512', type: 'image/png' }
+                    ]
+                });
+
+                navigator.mediaSession.setActionHandler('play', () => {
+                    audio.play();
+                    isPlaying = true;
+                    document.getElementById('play-pause').textContent = 'Pause';
+                });
+
+                navigator.mediaSession.setActionHandler('pause', () => {
+                    audio.pause();
+                    isPlaying = false;
+                    document.getElementById('play-pause').textContent = 'Play';
+                });
+
+                navigator.mediaSession.setActionHandler('seekbackward', () => {
+                    audio.currentTime = Math.max(0, audio.currentTime - 20);
+                });
+
+                navigator.mediaSession.setActionHandler('seekforward', () => {
+                    audio.currentTime = Math.min(audio.duration, audio.currentTime + 20);
+                });
+
+                navigator.mediaSession.setActionHandler('seekto', (details) => {
+                    if (details.fastSeek && 'fastSeek' in audio) {
+                        audio.fastSeek(details.seekTime);
+                    } else {
+                        audio.currentTime = details.seekTime;
+                    }
+                });
+            }
+        }
+
+        // Settings functionality
+        document.querySelector('.settings').addEventListener('click', function() {
+            document.getElementById('settings-overlay').style.display = 'flex';
+        });
+
+        document.getElementById('save-settings').addEventListener('click', function() {
+            const backgroundColor = document.getElementById('background-color').value;
+            const theme = document.getElementById('theme').value;
+
+            document.body.style.backgroundColor = backgroundColor;
+
+            // Apply theme (changing background, player background, and font)
+            switch (theme) {
+                case 'retro':
+                    document.body.style.backgroundColor = '#FFD700';
+                    document.querySelector('.player').style.backgroundColor = '#8B4513';
+                    document.body.style.fontFamily = 'Courier, monospace';
+                    document.body.style.color = '#4B0082';
+                    break;
+                case 'old':
+                    document.body.style.backgroundColor = '#F4A460';
+                    document.querySelector('.player').style.backgroundColor = '#D2691E';
+                    document.body.style.fontFamily = 'Georgia, serif';
+                    document.body.style.color = '#8B4513';
+                    break;
+                case 'western':
+                    document.body.style.backgroundColor = '#DEB887';
+                    document.querySelector('.player').style.backgroundColor = '#B8860B';
+                    document.body.style.fontFamily = 'Rockwell, serif';
+                    document.body.style.color = '#8B4513';
+                    break;
+                case 'modern':
+                    document.body.style.backgroundColor = '#F0F0F0';
+                    document.querySelector('.player').style.backgroundColor = '#FFFFFF';
+                    document.body.style.fontFamily = 'Arial, sans-serif';
+                    document.body.style.color = '#333333';
+                    break;
+                case 'futuristic':
+                    document.body.style.backgroundColor = '#000000';
+                    document.querySelector('.player').style.backgroundColor = '#1E90FF';
+                    document.body.style.fontFamily = 'Orbitron, sans-serif';
+                    document.body.style.color = '#00FFFF';
+                    break;
+                case 'spacey':
+                    document.body.style.backgroundColor = '#000033';
+                    document.querySelector('.player').style.backgroundColor = '#4B0082';
+                    document.body.style.fontFamily = 'Nova Square, sans-serif';
+                    document.body.style.color = '#FFFFFF';
+                    break;
+                case 'Christmas':
+                    document.body.style.backgroundColor = '#006400';
+                    document.querySelector('.player').style.backgroundColor = '#B22222';
+                    document.body.style.fontFamily = 'Brush Script MT, cursive';
+                    document.body.style.color = '#FFFFFF';
+                    break;
+                case 'Halloween':
+                    document.body.style.backgroundColor = '#FF4500';
+                    document.querySelector('.player').style.backgroundColor = '#000000';
+                    document.body.style.fontFamily = 'Creepster, cursive';
+                    document.body.style.color = '#FFFFFF';
+                    break;
+                case 'Summer':
+                    document.body.style.backgroundColor = '#87CEEB';
+                    document.querySelector('.player').style.backgroundColor = '#FFD700';
+                    document.body.style.fontFamily = 'Comic Sans MS, cursive';
+                    document.body.style.color = '#008000';
+                    break;
+                default:
+                    document.body.style.backgroundColor = '#F0F0F0';
+                    document.querySelector('.player').style.backgroundColor = '#FFFFFF';
+                    document.body.style.fontFamily = 'Arial, sans-serif';
+                    document.body.style.color = '#333333';
+            }
+
+            document.getElementById('settings-overlay').style.display = 'none';
+        });
+
+        // Equalizer functionality
+        document.getElementById('equalizer-button').addEventListener('click', function() {
+            document.getElementById('equalizer-overlay').style.display = 'flex';
+        });
+
+        // Initialize audio context and source node
+        let audioContext, sourceNode, filters = [];
+
+        function initAudio() {
+            if (!audioContext) {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                sourceNode = audioContext.createMediaElementSource(audio);
+                filters = [];
+                applyEqualizerPreset('flat'); // Set default flat EQ
+            }
+        }
+
+        // Function to apply equalizer preset
+        function applyEqualizerPreset(preset) {
+            if (!audioContext) initAudio();
+
+            const presetValues = {
+                'flat': [0, 0, 0, 0, 0],
+                'bass-boost': [7, 5, -2, -4, -4],
+                'treble-boost': [-5, -2, 2, 4, 6],
+                'vocal-boost': [-2, -1, 0, 3, -1],
+                'rock': [4, 3, -4, 3, 4],
+                'pop': [-1, 2, 3, 2, -1]
+            };
+
+            const bands = [60, 230, 910, 4000, 14000]; // Frequency bands
+            const values = presetValues[preset] || presetValues['flat'];
+
+            // Disconnect existing filters
+            if (filters.length > 0) {
+                sourceNode.disconnect();
+                filters.forEach(filter => filter.disconnect());
+            }
+
+            filters = bands.map((freq, i) => {
+                const filter = audioContext.createBiquadFilter();
+                filter.type = 'peaking';
+                filter.frequency.value = freq;
+                filter.Q.value = 1;
+                filter.gain.value = values[i];
+                return filter;
+            });
+
+            // Connect filters in series
+            sourceNode.connect(filters[0]);
+            filters.forEach((filter, i) => {
+                if (i < filters.length - 1) {
+                    filter.connect(filters[i + 1]);
+                } else {
+                    filter.connect(audioContext.destination);
+                }
+            });
+        }
+
+        document.getElementById('save-equalizer').addEventListener('click', function() {
+            const preset = document.getElementById('preset').value;
+            const customPreset = document.getElementById('custom-preset').value;
+
+            if (customPreset) {
+                // Parse and apply custom preset
+                const customValues = customPreset.split(',').map(Number);
+                if (customValues.length === 5) {
+                    applyEqualizerPreset('flat'); // Reset to flat first
+                    filters.forEach((filter, i) => {
+                        filter.gain.value = customValues[i];
+                    });
+                } else {
+                    console.error('Invalid custom preset. Please provide 5 comma-separated values.');
+                }
+            } else {
+                applyEqualizerPreset(preset);
+            }
+
+            document.getElementById('equalizer-overlay').style.display = 'none';
+        });
+
+        // Call initAudio when the first song is loaded or when play is pressed
+        audio.addEventListener('loadedmetadata', initAudio);
+        document.querySelector('.play').addEventListener('click', initAudio);
+
+        // Like button functionality
+        document.getElementById('like-button').addEventListener('click', function() {
+            if (currentFile) {
+                if (likedFiles.has(currentFile.name)) {
+                    likedFiles.delete(currentFile.name);
+                    this.textContent = 'Like';
+                } else {
+                    likedFiles.add(currentFile.name);
+                    this.textContent = 'Liked';
+                }
+            }
+        });
+
+        function updateLikeButton(file) {
+            const likeButton = document.getElementById('like-button');
+            if (likedFiles.has(file.name)) {
+                likeButton.textContent = 'Liked';
+            } else {
+                likeButton.textContent = 'Like';
+            }
+        }
+        let idleTime = 0;
+        const idleLimit = 300; // Idle time limit in seconds (5 minutes)
+        
+        const overlay = document.getElementById('overlay');
+        
+        // Function to reset idle time and fade out the overlay
+        function resetIdle() {
+            idleTime = 0; // Reset the idle time
+        
+            // Fade out the overlay when user interacts
+            overlay.classList.remove('active');
+        }
+        
+        // Function to check idle time
+        function checkIdle() {
+            idleTime++;
+            if (idleTime >= idleLimit) {
+                // User is idle, fade in the overlay
+                overlay.classList.add('active');
+            }
+        }
+        
+        // Increment idle time every minute
+        setInterval(checkIdle, 1000); // Check every second
+        
+        // Reset idle time on various events
+        window.onload = resetIdle; // Reset on page load
+        document.onmousemove = resetIdle;
+        document.onkeypress = resetIdle;
+        document.onscroll = resetIdle;
+        document.onclick = resetIdle;
+        
+        // Add more JavaScript code for other functionalities here
+    </script>
+    <script>
+        // Generate a large number of sample songs
+        const songs = Array.from({ length: 100 }, (_, i) => ({
+            title: `Song ${i + 1}`,
+            artist: `Artist ${i + 1}`
+        }));
+
+        // Function to populate the sidebar with songs
+        function populateSidebar(songList) {
+            const songListElement = document.getElementById('song-list');
+            songListElement.innerHTML = '';
+            songList.forEach((song, index) => {
+                const li = document.createElement('li');
+                li.textContent = `${song.title} - ${song.artist}`;
+                li.onclick = () => playSong(song);
+                songListElement.appendChild(li);
+            });
+        }
+
+// Initialize with all songs
+populateSidebar(songs);
+    </script>
+</body>
+</html>
